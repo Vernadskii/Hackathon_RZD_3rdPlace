@@ -30,30 +30,38 @@ def callback_query(call):
 
 @bot.message_handler(content_types=['document'])
 def send_doc(message):
-    bot.send_message(message.chat.id, "Спасибо, я получил файл, который буду обрабатывать\n"
-                                      "Как только я закончу работу, пришлю тебе ответное письмо...")
-    from functions import network_functions
-    if network_functions.connect():
-        file = bot.download_file(bot.get_file(message.document.file_id).file_path)  # Получаем объект класса 'bytes'
-        src = str(bot.get_file(message.document.file_id).file_path)     # Создали адрес, куда будем сохранять файл
-        with open(src, 'wb') as new_file:   # Создали и записали файл
-            new_file.write(file)
-        with open(src, 'rb') as file_to_send:   # Открываем файл для отправки
-            import requests
-            r = requests.post('https://urbanml.art/post/excel', files={'file': file_to_send})   # Отправляем файл
-            print("Файл успешно отправлен на сервер")
-            src = "text files/" + str(bot.get_file(message.document.file_id).file_path)     # Адрес для файла полученного в ответ
-            with open(src, 'wb') as new_file:   # Записываем полученный ответ на post
-                new_file.write(r.content)
-            print("Ответный файл успешно получен")
-    else:
-        bot.send_message(message.chat.id, "К сожалению, произошла ошибка подключения к серверу :(")
-
-    # file_id = message.document.file_id
-    # bot.send_document(message.chat.id, file_id)
-    # file_url = bot.get_file_url(message.document.file_id)  # Ссылка на файл, отправленный пользователем
-    # bot.get_file(message.document.file_id).file_path     # Получаем адрес файла на сервере
-    # в виде "documents/file_6.xlsx"
+    """ Не очень оптимизированная функция обработки файла.
+        Функция отправляет полученный файл от пользователя и отправляет его на сервер,
+        далее получает обработанный и отправляет его конечному пользователю"""
+    import os
+    try:
+        bot.send_message(message.chat.id, "Спасибо, я получил файл, который буду обрабатывать\n"
+                                          "Как только я закончу работу, пришлю тебе обработанный файл...")
+        from functions import network_functions
+        if network_functions.connect():     # Проверяем, работает ли сервер
+            file_from_user = bot.download_file(bot.get_file(message.document.file_id).file_path)  # Получаем объект 'bytes'
+            name_of_file = str(bot.get_file(message.document.file_id).file_path)[9:]   # Иникальное имя файла, выданное тг
+            address_file_from_user = "files_from_user" + name_of_file    # Адрес, куда будем сохранять файл
+            with open(address_file_from_user, 'wb') as new_file:   # Создали и записали файл
+                new_file.write(file_from_user)
+            with open(address_file_from_user, 'rb') as file_to_send:   # Открываем файл и отправляем его
+                import requests
+                r = requests.post('https://urbanml.art/post/excel', files={'file': file_to_send})
+                print("Файл успешно отправлен на сервер")
+            src_result = "result_files" + name_of_file    # Адрес для ответа на post
+            with open(src_result, 'wb') as result_file:   # Записываем полученный ответ на post
+                result_file.write(r.content)
+            with open(src_result, 'rb') as file_for_user:   # Открываем для отправки конечному пользователю
+                bot.send_document(message.chat.id, file_for_user)
+                print("Файл успешно отправлен пользователю")
+            os.remove(address_file_from_user)   #
+            os.remove(src_result)
+        else:
+            bot.send_message(message.chat.id, "К сожалению, произошла ошибка подключения к серверу :(")
+    except Exception as ex:
+        import logging
+        logging.critical(ex)
+        bot.send_message(message.chat.id, "Произошла ошибка обработки файла...")
 
 
 bot.polling(none_stop=False, interval=0, timeout=20)
