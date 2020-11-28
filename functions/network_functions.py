@@ -17,7 +17,7 @@ def connect():
         return False
 
 
-def send_email(send_to, source):
+def send_email(send_to, source, first_name):
     """ Функция для отправки файла на почту """
     try:
         import smtplib
@@ -32,12 +32,12 @@ def send_email(send_to, source):
         msg['To'] = send_to
         msg['Date'] = formatdate(localtime=True)
         msg['Subject'] = "Письмо из хакатона :)"
-        msg.attach(MIMEText('Письмо с результатом анализа'))
+        msg.attach(MIMEText('Письмо с результатом анализа от пользователя ' + str(first_name)))
 
         part = MIMEBase('application', "octet-stream")
         part.set_payload(open(source, "rb").read())
         encoders.encode_base64(part)
-        part.add_header('Content-Disposition', 'attachment; filename="WorkBook3.xlsx"')
+        part.add_header('Content-Disposition', 'attachment; filename=Report.xlsx')
         msg.attach(part)
 
         smtp = smtplib.SMTP('smtp.gmail.com', 587)

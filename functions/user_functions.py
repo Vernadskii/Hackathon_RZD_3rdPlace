@@ -28,13 +28,16 @@ def about_prog(message_chat_id, bot):
     button1 = types.InlineKeyboardButton(text="🔙 Назад", callback_data="start")
     markup = types.InlineKeyboardMarkup()
     markup.row(button1)
-    bot.send_message(message_chat_id, "Здесь я тебе расскажу о себе, когда у меня будет задача :)", reply_markup=markup)
+    bot.send_message(message_chat_id, "Я бот-аналитик РЖД\n"
+                                      "Я могу составлять отчеты по запросу или по расписанию. "
+                                      "Я анализирую работу ремонтых служб и помогаю улучшить работу дороги 🚂",
+                     reply_markup=markup)
 
 
 def do_you_wanna_send_email(message_chat_id, bot):
     """Функция выбора пользователем отправки файла на email"""
-    button1 = types.InlineKeyboardButton(text="Хочу", callback_data="want")
-    button2 = types.InlineKeyboardButton(text="Не хочу", callback_data="dontwant")
+    button1 = types.InlineKeyboardButton(text="Хочу 📧️", callback_data="want")
+    button2 = types.InlineKeyboardButton(text="Не хочу 📮", callback_data="dont_want")
     markup = types.InlineKeyboardMarkup()
     markup.add(button1, button2)
     bot.send_message(message_chat_id, "Хочешь получить отчёт ещё и на почту?", reply_markup=markup)
@@ -44,14 +47,20 @@ def want(message_chat_id, bot, src_res):
     """Если пользователь захотел получить письмо на почту"""
     bot.send_message(message_chat_id, "Введи email адрес:")
 
-    @bot.message_handler(content_types=['text'])    # Получаем почтовый адрес
+    @bot.message_handler(content_types=['text'])    # Получаем от пользователя почтовый адрес
     def check_email(message):
         from functions import network_functions
-        network_functions.send_email(message.text, src_res)
+        network_functions.send_email(message.text, src_res, message.chat.first_name)
         button1 = types.InlineKeyboardButton(text="🔙 Начало", callback_data="start")
         markup = types.InlineKeyboardMarkup()
         markup.row(button1)
         bot.send_message(message_chat_id, "Письмо успешно отправлено на " + str(message.text), reply_markup=markup)
 
 
-
+def dont_want(message_chat_id, bot):
+    """Если пользователь не захотел получить письмо на почту"""
+    button1 = types.InlineKeyboardButton(text="🔙 Начало", callback_data="start")
+    markup = types.InlineKeyboardMarkup()
+    markup.row(button1)
+    bot.send_message(message_chat_id, "Хорошо, тогда ты уже можешь заново взаимодействовать со мной нажав кнопку",
+                     reply_markup=markup)

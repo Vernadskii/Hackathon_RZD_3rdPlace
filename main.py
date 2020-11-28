@@ -16,7 +16,7 @@ def send_welcome(message):
 
 from functions import user_functions
 FUNCTIONS = dict(start=user_functions.start, download_excel=user_functions.download_excel,
-                 about_prog=user_functions.about_prog, want=user_functions.want)
+                 about_prog=user_functions.about_prog, dont_want=user_functions.dont_want)
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -38,9 +38,9 @@ def callback_query(call):
 def send_doc(message):
     """ Функция приёма файлов и отправки ссылок на них серверу """
     try:
-        bot.send_message(message.chat.id, "Теперь отправь мне второй...")
         from functions import network_functions
         if network_functions.connect():     # Проверяем, работает ли сервер
+            bot.send_message(message.chat.id, "Теперь отправь мне второй...")
             file_url1 = bot.get_file_url(message.document.file_id)
             return bot.register_next_step_handler(message, process_second_file, file_url1)
         else:
