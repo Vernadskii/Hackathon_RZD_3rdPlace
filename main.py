@@ -30,38 +30,31 @@ def callback_query(call):
 
 @bot.message_handler(content_types=['document'])
 def send_doc(message):
-    """ Не очень оптимизированная функция обработки файла.
-        Функция отправляет полученный файл от пользователя и отправляет его на сервер,
-        далее получает обработанный и отправляет его конечному пользователю"""
-    import os
+    """ Функция приёма файлов и отправки ссылок на них серверу """
+
     try:
-        bot.send_message(message.chat.id, "Спасибо, я получил файл, который буду обрабатывать\n"
-                                          "Как только я закончу работу, пришлю тебе обработанный файл...")
+        bot.send_message(message.chat.id, "Спасибо, я получил первый файл, который буду обрабатывать\n"
+                                          "Теперь отправь мне второй...")
         from functions import network_functions
         if network_functions.connect():     # Проверяем, работает ли сервер
-            file_from_user = bot.download_file(bot.get_file(message.document.file_id).file_path)  # Получаем объект 'bytes'
-            name_of_file = str(bot.get_file(message.document.file_id).file_path)[9:]   # Иникальное имя файла, выданное тг
-            address_file_from_user = "files_from_user" + name_of_file    # Адрес, куда будем сохранять файл
-            with open(address_file_from_user, 'wb') as new_file:   # Создали и записали файл
-                new_file.write(file_from_user)
-            with open(address_file_from_user, 'rb') as file_to_send:   # Открываем файл и отправляем его
-                import requests
-                r = requests.post('https://urbanml.art/post/excel', files={'file': file_to_send})
-                print("Файл успешно отправлен на сервер")
-            src_result = "result_files" + name_of_file    # Адрес для ответа на post
-            with open(src_result, 'wb') as result_file:   # Записываем полученный ответ на post
-                result_file.write(r.content)
-            with open(src_result, 'rb') as file_for_user:   # Открываем для отправки конечному пользователю
-                bot.send_document(message.chat.id, file_for_user)
-                print("Файл успешно отправлен пользователю")
-            os.remove(address_file_from_user)   #
-            os.remove(src_result)
+            file_url1 = bot.get_file_url(message.document.file_id)
+            return bot.register_next_step_handler(message, process_second_file, file_url1)
         else:
             bot.send_message(message.chat.id, "К сожалению, произошла ошибка подключения к серверу :(")
     except Exception as ex:
         import logging
         logging.critical(ex)
         bot.send_message(message.chat.id, "Произошла ошибка обработки файла...")
+
+
+def process_second_file(message, file_url1):
+    file_url2 = bot.get_file_url(message.document.file_id)
+    print(file_url1)
+    print(file_url2)
+    import requests
+    r = requests.post('https://urbanml.art/post/excel', files={'file1': file_url1, 'file2': file_url2})
+    print(r.text)
+    bot.reply_to(message, "Файлы отправлены на вычислительный сервер. Ждём ответа...")
 
 
 bot.polling(none_stop=False, interval=0, timeout=20)
