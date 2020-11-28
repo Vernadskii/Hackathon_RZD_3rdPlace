@@ -31,10 +31,8 @@ def callback_query(call):
 @bot.message_handler(content_types=['document'])
 def send_doc(message):
     """ Функция приёма файлов и отправки ссылок на них серверу """
-
     try:
-        bot.send_message(message.chat.id, "Спасибо, я получил первый файл, который буду обрабатывать\n"
-                                          "Теперь отправь мне второй...")
+        bot.send_message(message.chat.id, "Теперь отправь мне второй...")
         from functions import network_functions
         if network_functions.connect():     # Проверяем, работает ли сервер
             file_url1 = bot.get_file_url(message.document.file_id)
@@ -51,10 +49,22 @@ def process_second_file(message, file_url1):
     file_url2 = bot.get_file_url(message.document.file_id)
     print(file_url1)
     print(file_url2)
-    import requests
-    r = requests.post('https://urbanml.art/post/excel', files={'file1': file_url1, 'file2': file_url2})
-    print(r.text)
     bot.reply_to(message, "Файлы отправлены на вычислительный сервер. Ждём ответа...")
+    import time
+    time.sleep(2)
+    import requests
+    r = requests.post('https://urbanml.art/post/links', json={"file1": file_url1, "file2": file_url2 })
+    import random
+    import string
+    letters = string.ascii_letters
+    name_file_to_save = ''.join(random.choice(letters) for i in range(2))
+    src_result = "result_files/Result_" + name_file_to_save + ".xlsx"
+    with open(src_result, 'wb') as result_file:  # Записываем полученный ответ на post в папку result_files
+        result_file.write(r.content)
+    print("Файл сохранён")
+    with open(src_result, 'rb') as file_for_user:  # Открываем для отправки конечному пользователю
+        bot.send_document(message.chat.id, file_for_user)
+    print("Файл успешно отправлен пользователю")
 
 
 bot.polling(none_stop=False, interval=0, timeout=20)
