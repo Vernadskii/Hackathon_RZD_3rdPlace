@@ -2,6 +2,7 @@
 import telebot
 import passwords
 bot = telebot.TeleBot(passwords.key)
+src_res = ''
 
 
 @bot.message_handler(commands=['start'])
@@ -14,14 +15,19 @@ def send_welcome(message):
 
 
 from functions import user_functions
-FUNCTIONS = dict(start=user_functions.start, download_excel=user_functions.download_excel, about_prog=user_functions.about_prog)
+FUNCTIONS = dict(start=user_functions.start, download_excel=user_functions.download_excel,
+                 about_prog=user_functions.about_prog, want=user_functions.want)
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     """Обработик inline-кнопок"""
     try:
-        FUNCTIONS[call.data](call.message.chat.id, bot)
+        if call.data == 'want':
+            from functions import user_functions
+            user_functions.want(call.message.chat.id, bot, src_res)
+        else:
+            FUNCTIONS[call.data](call.message.chat.id, bot)
     except Exception as ex:
         import logging
         logging.critical(ex)
@@ -65,6 +71,10 @@ def process_second_file(message, file_url1):
     with open(src_result, 'rb') as file_for_user:  # Открываем для отправки конечному пользователю
         bot.send_document(message.chat.id, file_for_user)
     print("Файл успешно отправлен пользователю")
+    global src_res
+    src_res = src_result
+    from functions import user_functions
+    user_functions.do_you_wanna_send_email(message.chat.id, bot)
 
 
 bot.polling(none_stop=False, interval=0, timeout=20)
