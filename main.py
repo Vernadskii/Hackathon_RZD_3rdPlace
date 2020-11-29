@@ -43,28 +43,25 @@ from functions import user_functions
 FUNCTIONS = dict(start=user_functions.start, reports=user_functions.reports,
                  download_excel=user_functions.download_excel, about_prog=user_functions.about_prog,
                  visualization=user_functions.visualization_series,
-                 dont_want=user_functions.dont_want)
+                 dont_want=user_functions.dont_want, rating=user_functions.rating)
+
+FUNCTIONS_other_format = dict(DUAMATIK=seriesss, RPB=seriesss, SHOM=seriesss, PMG=seriesss,
+                              April=monthhh, May=monthhh, June=monthhh, July=monthhh, August=monthhh)
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     """Обработик inline-кнопок"""
     #try:
-    if call.data == 'DUAMATIK':seriesss(call.data, call.message.chat.id)
-    if call.data == 'RPB':seriesss(call.data, call.message.chat.id)
-    if call.data == 'SHOM':seriesss(call.data, call.message.chat.id)
-    if call.data == 'PMG':seriesss(call.data, call.message.chat.id)
-
-    if call.data == 'April':monthhh(call.data, call.message.chat.id)
-    if call.data == 'May':monthhh(call.data, call.message.chat.id)
-    if call.data == 'June':monthhh(call.data, call.message.chat.id)
-    if call.data == 'July':monthhh(call.data, call.message.chat.id)
-    if call.data == 'August':monthhh(call.data, call.message.chat.id)
     if call.data == 'want':
         from functions import user_functions
         user_functions.want(call.message.chat.id, bot, src_res)
     try:
         FUNCTIONS[call.data](call.message.chat.id, bot)
+    except:
+        pass
+    try:
+        FUNCTIONS_other_format[call.data](call.data, call.message.chat.id)
     except:
         pass
     """

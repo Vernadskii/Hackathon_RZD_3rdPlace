@@ -7,7 +7,7 @@ def start(message_chat_id, bot):
     button1 = types.InlineKeyboardButton(text="📃 О программе", callback_data="about_prog")
     button2 = types.InlineKeyboardButton(text="🧳 Загрузить отчёт", callback_data="reports")
     button3 = types.InlineKeyboardButton(text="🖼️ Визуализировать", callback_data="visualization")
-    button4 = types.InlineKeyboardButton(text="💹 Рейтинг", callback_data="vi")
+    button4 = types.InlineKeyboardButton(text="💹 Рейтинг", callback_data="rating")
     markup = types.InlineKeyboardMarkup()
     markup.row(button1)
     markup.row(button2)
@@ -69,12 +69,9 @@ def about_prog(message_chat_id, bot):
                      reply_markup=markup)
 
 
-def visualize(message_chat_id, bot):
-    try:
-        import requests
-        bot.send_document(message_chat_id, 'https://urbanml.art/get/plot/1', caption="РПБ-01_2020-04-01")
-    except Exception as ex:
-        print(ex)
+def rating(message_chat_id, bot):
+    pass
+
 
 
 def do_you_wanna_send_email(message_chat_id, bot):
