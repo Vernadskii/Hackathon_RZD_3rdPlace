@@ -31,15 +31,9 @@ def monthhh(month, message_chat_id):
             new_file.write(r.content)
         with open("docs/graph", 'rb') as file_to_send:  # Открываем файл и отправляем его
             bot.send_document(message_chat_id, file_to_send)
-        
-        file_from_user = bot.download_file('https://urbanml.art/get/plot/' + tree_of_steps)
-        bot.send_document(message_chat_id, file_from_user)
+
     except Exception as ex:
         print(ex)
-    #bot.send_message(message_chat_id, 'https://urbanml.art/get/plot/' + tree_of_steps)
-
-
-    #delet = len(aba[month]) + 1
     tree_of_steps = tree_of_steps[:length_tmp]
     print(tree_of_steps)
 
