@@ -8,11 +8,13 @@ def start(message_chat_id, bot):
     button2 = types.InlineKeyboardButton(text="🧳 Загрузить отчёт", callback_data="reports")
     button3 = types.InlineKeyboardButton(text="🖼️ Визуализировать", callback_data="visualization")
     button4 = types.InlineKeyboardButton(text="💹 Рейтинг", callback_data="rating")
+    button5 = types.InlineKeyboardButton(text="🛰️ Прогноз", callback_data="forecast")
     markup = types.InlineKeyboardMarkup()
     markup.row(button1)
     markup.row(button2)
     markup.row(button3)
     markup.row(button4)
+    markup.row(button5)
     bot.send_message(message_chat_id, "Чем вам помочь?\n", reply_markup=markup)
 
 
@@ -144,3 +146,74 @@ def dont_want(message_chat_id, bot):
     markup.row(button1)
     bot.send_message(message_chat_id, "Хорошо, тогда ты уже можешь заново взаимодействовать со мной нажав кнопку",
                      reply_markup=markup)
+
+
+def forecast(message_chat_id, bot):
+    """Прогноз"""
+    button1 = types.InlineKeyboardButton(text="ДУОМАТИК09-32GSM", callback_data="forec_D")
+    button2 = types.InlineKeyboardButton(text="РПБ-01", callback_data="forec_R")
+    button3 = types.InlineKeyboardButton(text="ЩОМ-1200М", callback_data="forec_Sh")
+    button4 = types.InlineKeyboardButton(text="ПМГ", callback_data="forec_P")
+    markup = types.InlineKeyboardMarkup()
+    markup.row(button1)
+    markup.row(button2)
+    markup.row(button3)
+    markup.row(button4)
+    bot.send_message(message_chat_id, "Выберите категорию:", reply_markup=markup)
+
+
+def forec_D(message_chat_id, bot):
+    """Прогноз"""
+    import requests
+    r = requests.get('https://urbanml.art/get/model/ДУОМАТИК09-32GSM')
+    with open("docs/forec_D.png", 'wb') as new_file:  # Создали и записали файл
+        new_file.write(r.content)
+    with open("docs/forec_D.png", 'rb') as file_to_send:  # Открываем файл и отправляем его
+        button1 = types.InlineKeyboardButton(text="🛰️ Новый прогноз", callback_data="forecast")
+        button2 = types.InlineKeyboardButton(text="🔙 Начало", callback_data="start")
+        markup = types.InlineKeyboardMarkup()
+        markup.row(button2, button1)
+        bot.send_document(message_chat_id, file_to_send, reply_markup=markup)
+
+
+def forec_R(message_chat_id, bot):
+    """Прогноз"""
+    import requests
+    r = requests.get('https://urbanml.art/get/model/РПБ-01')
+    with open("docs/forec_R.png", 'wb') as new_file:  # Создали и записали файл
+        new_file.write(r.content)
+    with open("docs/forec_R.png", 'rb') as file_to_send:  # Открываем файл и отправляем его
+        button1 = types.InlineKeyboardButton(text="🛰️ Новый прогноз", callback_data="forecast")
+        button2 = types.InlineKeyboardButton(text="🔙 Начало", callback_data="start")
+        markup = types.InlineKeyboardMarkup()
+        markup.row(button2, button1)
+        bot.send_document(message_chat_id, file_to_send, reply_markup=markup)
+
+
+def forec_Sh(message_chat_id, bot):
+    """Прогноз"""
+    import requests
+    r = requests.get('https://urbanml.art/get/model/ЩОМ-1200М')
+    with open("docs/forec_Sh.png", 'wb') as new_file:  # Создали и записали файл
+        new_file.write(r.content)
+    with open("docs/forec_Sh.png", 'rb') as file_to_send:  # Открываем файл и отправляем его
+        button1 = types.InlineKeyboardButton(text="🛰️ Новый прогноз", callback_data="forecast")
+        button2 = types.InlineKeyboardButton(text="🔙 Начало", callback_data="start")
+        markup = types.InlineKeyboardMarkup()
+        markup.row(button2, button1)
+        bot.send_document(message_chat_id, file_to_send, reply_markup=markup)
+
+
+def forec_P(message_chat_id, bot):
+    """Прогноз"""
+    import requests
+    r = requests.get('https://urbanml.art/get/model/ПМГ')
+    with open("docs/forec_P.png", 'wb') as new_file:  # Создали и записали файл
+        new_file.write(r.content)
+    with open("docs/forec_P.png", 'rb') as file_to_send:  # Открываем файл и отправляем его
+        button1 = types.InlineKeyboardButton(text="🛰️ Новый прогноз", callback_data="forecast")
+        button2 = types.InlineKeyboardButton(text="🔙 Начало", callback_data="start")
+        markup = types.InlineKeyboardMarkup()
+        markup.row(button2, button1)
+        bot.send_document(message_chat_id, file_to_send, reply_markup=markup)
+

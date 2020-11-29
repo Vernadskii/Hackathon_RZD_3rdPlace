@@ -112,7 +112,9 @@ from functions import user_functions
 FUNCTIONS = dict(start=user_functions.start, reports=user_functions.reports,
                  download_excel=user_functions.download_excel, about_prog=user_functions.about_prog,
                  visualization=user_functions.visualization_series,
-                 dont_want=user_functions.dont_want, rating=user_functions.rating)
+                 dont_want=user_functions.dont_want, rating=user_functions.rating, forecast=user_functions.forecast,
+                 forec_D=user_functions.forec_D, forec_P=user_functions.forec_P, forec_Sh=user_functions.forec_Sh,
+                 forec_R=user_functions.forec_R)
 
 FUNCTIONS_other_format = dict(DUAMATIK=seriesss, RPB=seriesss, SHOM=seriesss, PMG=seriesss,
                               April=monthhh, May=monthhh, June=monthhh, July=monthhh, August=monthhh)
@@ -167,11 +169,9 @@ def send_doc(message):
 
 def process_second_file(message, file_url1):
     file_url2 = bot.get_file_url(message.document.file_id)
-    print(file_url1)
-    print(file_url2)
+    #print(file_url1)
+    #print(file_url2)
     bot.reply_to(message, "Файлы отправлены на вычислительный сервер. Ждём ответа...")
-    #import time
-    #time.sleep(2)
     import requests
     r = requests.post('https://urbanml.art/post/links', json={"file1": file_url1, "file2": file_url2 })
     import random
