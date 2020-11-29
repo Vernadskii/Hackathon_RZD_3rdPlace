@@ -3,6 +3,31 @@ import telebot
 import passwords
 bot = telebot.TeleBot(passwords.key)
 src_res = ''
+tree_of_steps = ''
+
+
+def seriesss(series, message_chat_id):
+    try:
+        global tree_of_steps
+        tree_of_steps = ''
+        aba = {'DUAMATIK': 'ДУОМАТИК09-32GSM', 'RPB': 'РПБ-01', 'SHOM': 'ЩОМ-1200М', 'PMG': 'ПМГ'}
+        print(aba[series])
+        tree_of_steps += aba[series]
+        from functions import user_functions
+        user_functions.rate_months(message_chat_id, bot)
+    except Exception as ex:
+        print(ex)
+
+
+def monthhh(month, message_chat_id):
+    aba = {'April': '2020-04-01', 'May': '2020-05-01', 'June': '2020-06-01', 'July':'2020-07-01', 'August':'2020-08-01'}
+    global tree_of_steps
+    length_tmp = len(tree_of_steps)
+    tree_of_steps += ("_"+aba[month])
+    bot.send_message(message_chat_id, 'https://urbanml.art/get/plot/' + tree_of_steps)
+    #delet = len(aba[month]) + 1
+    tree_of_steps = tree_of_steps[:length_tmp]
+    print(tree_of_steps)
 
 
 @bot.message_handler(commands=['start'])
@@ -15,23 +40,39 @@ def send_welcome(message):
 
 
 from functions import user_functions
-FUNCTIONS = dict(start=user_functions.start, download_excel=user_functions.download_excel,
-                 about_prog=user_functions.about_prog, dont_want=user_functions.dont_want)
+FUNCTIONS = dict(start=user_functions.start, reports=user_functions.reports,
+                 download_excel=user_functions.download_excel, about_prog=user_functions.about_prog,
+                 visualization=user_functions.visualization_series,
+                 dont_want=user_functions.dont_want)
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     """Обработик inline-кнопок"""
+    #try:
+    if call.data == 'DUAMATIK':seriesss(call.data, call.message.chat.id)
+    if call.data == 'RPB':seriesss(call.data, call.message.chat.id)
+    if call.data == 'SHOM':seriesss(call.data, call.message.chat.id)
+    if call.data == 'PMG':seriesss(call.data, call.message.chat.id)
+
+    if call.data == 'April':monthhh(call.data, call.message.chat.id)
+    if call.data == 'May':monthhh(call.data, call.message.chat.id)
+    if call.data == 'June':monthhh(call.data, call.message.chat.id)
+    if call.data == 'July':monthhh(call.data, call.message.chat.id)
+    if call.data == 'August':monthhh(call.data, call.message.chat.id)
+    if call.data == 'want':
+        from functions import user_functions
+        user_functions.want(call.message.chat.id, bot, src_res)
     try:
-        if call.data == 'want':
-            from functions import user_functions
-            user_functions.want(call.message.chat.id, bot, src_res)
-        else:
-            FUNCTIONS[call.data](call.message.chat.id, bot)
+        FUNCTIONS[call.data](call.message.chat.id, bot)
+    except:
+        pass
+    """
     except Exception as ex:
         import logging
         logging.critical(ex)
         logging.critical(" Ошибка в callback_query_handler")
+    """
 
 
 @bot.message_handler(content_types=['document'])
@@ -40,7 +81,7 @@ def send_doc(message):
     try:
         from functions import network_functions
         if network_functions.connect():     # Проверяем, работает ли сервер
-            bot.send_message(message.chat.id, "Теперь отправь мне второй...")
+            bot.send_message(message.chat.id, "Теперь отправь мне второй (ССПС) ...")
             file_url1 = bot.get_file_url(message.document.file_id)
             return bot.register_next_step_handler(message, process_second_file, file_url1)
         else:
