@@ -70,7 +70,30 @@ def about_prog(message_chat_id, bot):
 
 
 def rating(message_chat_id, bot):
-    pass
+    from functions import network_functions
+    if network_functions.connect():
+        import requests
+        #r = requests.get('https://urbanml.art/hello/username')
+        columns_map = {
+            "date": "Дата работ",
+            "machine_type": "Серия машины",
+            "value": "Вып. объем физич.",
+            "company_y": "Предприятие",
+            "au12": "АУ-12",
+            "rate_norm": "Расход топлива по норме",
+            "rate_fact": "Расход топлива по фактический",
+            "low_rate": "Экономия",
+            "up_rate": "Перерасход",
+            "residue": "Остаток в баках на конец периода"
+        }
+        """
+        {"0": {"machine_type": "\\u0414\\u0423\\u041e\\u041c\\u0410\\u0422\\u0418\\u041a09-32GSM", "machine_number": 39,
+               "residue": 103356.0},
+         "1": {"machine_type": "\\u041c\\u041f\\u0422-4", "machine_number": 1211, "residue": 29386.0},
+         "2": {"machine_type": "\\u041c\\u041f\\u0422-4", "machine_number": 726, "residue": 26308.0},
+         "3": {"machine_type": "\\u0414\\u0421\\u041f-\\u04216", "machine_number": 37, "residue": 22936.0},
+         "4": {"machine_type": "\\u041c\\u041f\\u0422-4", "machine_number": 381, "residue": 21148.0}}
+        """
 
 
 

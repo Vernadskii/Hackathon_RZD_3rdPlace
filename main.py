@@ -24,7 +24,21 @@ def monthhh(month, message_chat_id):
     global tree_of_steps
     length_tmp = len(tree_of_steps)
     tree_of_steps += ("_"+aba[month])
-    bot.send_message(message_chat_id, 'https://urbanml.art/get/plot/' + tree_of_steps)
+    try:
+        import requests
+        r = requests.get('https://urbanml.art/get/plot/' + tree_of_steps)
+        with open("docs/graph", 'wb') as new_file:  # Создали и записали файл
+            new_file.write(r.content)
+        with open("docs/graph", 'rb') as file_to_send:  # Открываем файл и отправляем его
+            bot.send_document(message_chat_id, file_to_send)
+        
+        file_from_user = bot.download_file('https://urbanml.art/get/plot/' + tree_of_steps)
+        bot.send_document(message_chat_id, file_from_user)
+    except Exception as ex:
+        print(ex)
+    #bot.send_message(message_chat_id, 'https://urbanml.art/get/plot/' + tree_of_steps)
+
+
     #delet = len(aba[month]) + 1
     tree_of_steps = tree_of_steps[:length_tmp]
     print(tree_of_steps)
@@ -52,24 +66,23 @@ FUNCTIONS_other_format = dict(DUAMATIK=seriesss, RPB=seriesss, SHOM=seriesss, PM
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     """Обработик inline-кнопок"""
-    #try:
-    if call.data == 'want':
-        from functions import user_functions
-        user_functions.want(call.message.chat.id, bot, src_res)
     try:
-        FUNCTIONS[call.data](call.message.chat.id, bot)
-    except:
-        pass
-    try:
-        FUNCTIONS_other_format[call.data](call.data, call.message.chat.id)
-    except:
-        pass
-    """
+        if call.data == 'want':
+            from functions import user_functions
+            user_functions.want(call.message.chat.id, bot, src_res)
+        try:
+            FUNCTIONS[call.data](call.message.chat.id, bot)
+        except:
+            pass
+        try:
+            FUNCTIONS_other_format[call.data](call.data, call.message.chat.id)
+        except:
+            pass
     except Exception as ex:
         import logging
         logging.critical(ex)
         logging.critical(" Ошибка в callback_query_handler")
-    """
+
 
 
 @bot.message_handler(content_types=['document'])
