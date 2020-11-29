@@ -16,42 +16,32 @@ def rating_top(type_of_top, message_chat_id):
                'top_up_rate': 'up_rate'}
 
         top_tree_of_steps += aba[type_of_top]
-        print(top_tree_of_steps, "<-top_tree_of_steps")
         from functions import user_functions
         user_functions.month_top(message_chat_id, bot)
     except Exception as ex:
         import logging
         logging.critical(ex)
-        print('ИскЛЮЧЕНИЕ!!!')
 
 
 def rating_month(type_of_top, message_chat_id):
     global top_tree_of_steps
+    aba = {'top_April': '2020-04-01', 'top_May': '2020-05-01', 'top_June': '2020-06-01', 'top_July': '2020-07-01'}
+    top_tree_of_steps += ("|" + aba[type_of_top])
+    length_tmp = len(top_tree_of_steps)
     try:
-        print("rating_month")
-        aba = {'top_April':'2020-04-01', 'top_May': '2020-05-01', 'top_June': '2020-06-01', 'top_July': '2020-07-01'}
-        top_tree_of_steps += ("|"+ aba[type_of_top])
-        length_tmp = len(top_tree_of_steps)
-        print("rating_month")
         import requests
         r = requests.get('https://urbanml.art/get/raiting/' + top_tree_of_steps)
         import json
-        print("rating_month")
         obj1 = json.loads(r.content)
-        print(obj1)
-        print("rating_month")
         obj2 = json.loads(obj1)
-        print("rating_month")
         res = ''
         count = 0
-        print(obj2)
         for key1 in obj2:
             count += 1
             res += str(count)+". "
             for i in obj2[key1].values():
                 res += str(i)+"   "
             res += '\n'
-        print(res)
         button1 = types.InlineKeyboardButton(text="📈 Новый ТОП", callback_data="rating")
         button2 = types.InlineKeyboardButton(text="🔙 Начало", callback_data="start")
         markup = types.InlineKeyboardMarkup()
@@ -68,7 +58,6 @@ def seriesss(series, message_chat_id):
         global tree_of_steps
         tree_of_steps = ''
         aba = {'DUAMATIK': 'ДУОМАТИК09-32GSM', 'RPB': 'РПБ-01', 'SHOM': 'ЩОМ-1200М', 'PMG': 'ПМГ'}
-        print(aba[series])
         tree_of_steps += aba[series]
         from functions import user_functions
         user_functions.rate_months(message_chat_id, bot)
@@ -87,7 +76,7 @@ def monthhh(month, message_chat_id):
         with open("docs/" + tree_of_steps + ".png", 'wb') as new_file:  # Создали и записали файл
             new_file.write(r.content)
         with open("docs/" + tree_of_steps + ".png", 'rb') as file_to_send:  # Открываем файл и отправляем его
-            button1 = types.InlineKeyboardButton(text="📈 Новый график", callback_data="visualization_series")
+            button1 = types.InlineKeyboardButton(text="📈 Новый график", callback_data="visualization")
             button2 = types.InlineKeyboardButton(text="🔙 Начало", callback_data="start")
             markup = types.InlineKeyboardMarkup()
             markup.row(button2, button1)
@@ -96,13 +85,12 @@ def monthhh(month, message_chat_id):
     except Exception as ex:
         print(ex)
     tree_of_steps = tree_of_steps[:length_tmp]
-    print(tree_of_steps)
 
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     """Реакция на /start"""
-    print(message)
+    print(message.from_user.username)
     bot.send_message(message.chat.id, "Привет, " + str(message.from_user.first_name)
                  + ", это твой личный друг-аналитик!")
     user_functions.start(message.chat.id, bot)

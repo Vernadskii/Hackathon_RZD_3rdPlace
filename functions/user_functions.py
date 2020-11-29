@@ -104,7 +104,6 @@ def rating(message_chat_id, bot):
 
 
 def month_top(message_chat_id, bot):
-    print("month_top")
     button1 = types.InlineKeyboardButton(text="Апрель", callback_data="top_April")
     button2 = types.InlineKeyboardButton(text="Май", callback_data="top_May")
     button3 = types.InlineKeyboardButton(text="Июнь", callback_data="top_June")
