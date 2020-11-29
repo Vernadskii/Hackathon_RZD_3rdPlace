@@ -1,9 +1,66 @@
 """ Функция для запуска """
 import telebot
 import passwords
+from telebot import types
 bot = telebot.TeleBot(passwords.key)
 src_res = ''
 tree_of_steps = ''
+top_tree_of_steps = ''
+
+
+def rating_top(type_of_top, message_chat_id):
+    try:
+        global top_tree_of_steps
+        top_tree_of_steps = ''
+        aba = {'top_residue': 'residue', 'top_rate_norm': 'rate_norm', 'top_low_rate': 'low_rate',
+               'top_up_rate': 'up_rate'}
+
+        top_tree_of_steps += aba[type_of_top]
+        print(top_tree_of_steps, "<-top_tree_of_steps")
+        from functions import user_functions
+        user_functions.month_top(message_chat_id, bot)
+    except Exception as ex:
+        import logging
+        logging.critical(ex)
+        print('ИскЛЮЧЕНИЕ!!!')
+
+
+def rating_month(type_of_top, message_chat_id):
+    global top_tree_of_steps
+    try:
+        print("rating_month")
+        aba = {'top_April':'2020-04-01', 'top_May': '2020-05-01', 'top_June': '2020-06-01', 'top_July': '2020-07-01'}
+        top_tree_of_steps += ("|"+ aba[type_of_top])
+        length_tmp = len(top_tree_of_steps)
+        print("rating_month")
+        import requests
+        r = requests.get('https://urbanml.art/get/raiting/' + top_tree_of_steps)
+        import json
+        print("rating_month")
+        obj1 = json.loads(r.content)
+        print(obj1)
+        print("rating_month")
+        obj2 = json.loads(obj1)
+        print("rating_month")
+        res = ''
+        count = 0
+        print(obj2)
+        for key1 in obj2:
+            count += 1
+            res += str(count)+". "
+            for i in obj2[key1].values():
+                res += str(i)+"   "
+            res += '\n'
+        print(res)
+        button1 = types.InlineKeyboardButton(text="📈 Новый ТОП", callback_data="rating")
+        button2 = types.InlineKeyboardButton(text="🔙 Начало", callback_data="start")
+        markup = types.InlineKeyboardMarkup()
+        markup.row(button2, button1)
+        bot.send_message(message_chat_id, res, reply_markup=markup)
+    except Exception as ex:
+        print(ex)
+    top_tree_of_steps = top_tree_of_steps[:length_tmp]
+    print(top_tree_of_steps)
 
 
 def seriesss(series, message_chat_id):
@@ -27,10 +84,14 @@ def monthhh(month, message_chat_id):
     try:
         import requests
         r = requests.get('https://urbanml.art/get/plot/' + tree_of_steps)
-        with open("docs/graph", 'wb') as new_file:  # Создали и записали файл
+        with open("docs/" + tree_of_steps + ".png", 'wb') as new_file:  # Создали и записали файл
             new_file.write(r.content)
-        with open("docs/graph", 'rb') as file_to_send:  # Открываем файл и отправляем его
-            bot.send_document(message_chat_id, file_to_send)
+        with open("docs/" + tree_of_steps + ".png", 'rb') as file_to_send:  # Открываем файл и отправляем его
+            button1 = types.InlineKeyboardButton(text="📈 Новый график", callback_data="visualization_series")
+            button2 = types.InlineKeyboardButton(text="🔙 Начало", callback_data="start")
+            markup = types.InlineKeyboardMarkup()
+            markup.row(button2, button1)
+            bot.send_document(message_chat_id, file_to_send, reply_markup=markup)
 
     except Exception as ex:
         print(ex)
@@ -61,6 +122,14 @@ FUNCTIONS_other_format = dict(DUAMATIK=seriesss, RPB=seriesss, SHOM=seriesss, PM
 def callback_query(call):
     """Обработик inline-кнопок"""
     try:
+        if call.data == 'top_residue': rating_top(call.data, call.message.chat.id)
+        if call.data == 'top_rate_norm': rating_top(call.data, call.message.chat.id)
+        if call.data == 'top_low_rate': rating_top(call.data, call.message.chat.id)
+        if call.data == 'top_up_rate': rating_top(call.data, call.message.chat.id)
+        if call.data == 'top_April': rating_month(call.data, call.message.chat.id)
+        if call.data == 'top_May': rating_month(call.data, call.message.chat.id)
+        if call.data == 'top_June': rating_month(call.data, call.message.chat.id)
+        if call.data == 'top_July': rating_month(call.data, call.message.chat.id)
         if call.data == 'want':
             from functions import user_functions
             user_functions.want(call.message.chat.id, bot, src_res)
@@ -101,8 +170,8 @@ def process_second_file(message, file_url1):
     print(file_url1)
     print(file_url2)
     bot.reply_to(message, "Файлы отправлены на вычислительный сервер. Ждём ответа...")
-    import time
-    time.sleep(2)
+    #import time
+    #time.sleep(2)
     import requests
     r = requests.post('https://urbanml.art/post/links', json={"file1": file_url1, "file2": file_url2 })
     import random
